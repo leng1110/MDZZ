@@ -9,10 +9,11 @@ class Curd extends Model
 
     
     
-    //查询所有数据
-    public function showInfo()
+    //添加
+    public function add($dbname,$data)
     {
-        return DB::table($this->dbname)->get();
+        return DB::table($dbname)->insert($data);
+
     }
 
     //删除

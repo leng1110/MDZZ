@@ -24,5 +24,22 @@ class AnchorController extends Controller
         return view('register/anchor_register_to',['cate' => $data]);
     }
 
+    public function anchor_info_add()
+    {
+    	$curd = new Curd();
+    	$data = Input::get();
+    	unset($data['_token']);
+
+    	if (session('user_id') != null) {
+    		$data['user_id'] = session('user_id');
+    	}
+
+    	if ($curd->add('anchor_exa',$data)) {
+            echo '<script>alert("保存成功");location.href="/"</script>';
+    	}
+        echo '<script>alert("保存失败");location.href="anchor_info"</script>';
+
+    }
+
     
 }

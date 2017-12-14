@@ -12,11 +12,6 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
-});
-
-
-Route::get('/', function () {
     return view('index/index');
 });
 
@@ -52,4 +47,7 @@ Route::any('anchor_register', function () {
 });
 
 Route::any('anchor_register_to','AnchorController@anchor_info');
+//主播信息添加
+Route::any('anchor_info_add','AnchorController@anchor_info_add');
+
 

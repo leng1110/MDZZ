@@ -350,13 +350,15 @@
                                 <div class="h5_head">
                   <span>完善主播资料</span>
                 </div>
-                                 <!-- <p class="real_auth_tips">（主播头像可到主播设置中修改，其他资料一经提交不得修改，请谨慎填写）</p> -->
-                 <table cellpadding="0" cellspacing="0" border="0" class="info_set">
+                <!-- <p class="real_auth_tips">（主播头像可到主播设置中修改，其他资料一经提交不得修改，请谨慎填写）</p> -->
+                <form action="anchor_info_add" method="post">
+                <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
+                <table cellpadding="0" cellspacing="0" border="0" class="info_set">
                     <tr>
                         <td class="td_1">主播昵称：</td>
                         <td class="td_2">
                             <div>
-                                <input type="text" class="phone_num" id="anchor_nick" placeholder="控制在6个汉字以内最佳" />
+                                <input type="text" class="phone_num" id="anchor_nick" placeholder="控制在6个汉字以内最佳" name="nickname" />
                                 <!-- <span>（限10个汉字或20个字符以内）</span> -->
                                 <span id="checkNickWord" style="display:none;">
                                     <i style="background-image:url(../main/statics/img/icon_notive.png);display: inline-block;width: 16px;height: 16px;vertical-align: middle;margin-top: -3px;"></i>
@@ -374,11 +376,10 @@
                     <tr>
                         <td class="td_1">直播品类：</td>
                         <td class="td_2">
-                            <select class="live_type" id="liveType">
-                                <option value="1">网游竞技</option>
-                                <option value="2">单机热游</option>
-                                <option value="3">娱乐综艺</option>
-                                <option value="4">手游休闲</option>
+                            <select class="live_type" id="liveType" name="live_cate">
+                                <?php foreach ($cate as $key => $value) { ?>
+                                <option value="<?php echo $value['game_id'] ?>"><?php echo $value['game_name'] ?></option>
+                                <?php } ?>
                             </select>
                             <span>（根据兴趣选择，仅作运营人员参考，不影响实际开播权限）</span>
                         </td>
@@ -396,21 +397,23 @@
                                 </div>
                             </div>
                             <!-- 上传头像 e -->
-                            <!-- <div class="img_wrap" id="imgWrap"> -->
-                                <!-- <img src="http://huyaimg.msstatic.com/avatar/1058/5b/91bce49bfbe23e37e423ddcd90883e_180_135.jpg" onerror="this.onerror='';this.src='http://huyaimg.msstatic.com/cdnimage/default/big_default_avatar.jpg'" alt="user"/> -->
-
-                            <!-- </div> -->
-                            <!-- <a href="javascript:void(0);" class="upload_btn" title="上传图片" id="avatar_upload_file">上传图片</a> -->
+                            <div class="img_wrap" id="imgWrap">
+                                <img src="" onerror="this.onerror='';this.src='http://huyaimg.msstatic.com/cdnimage/default/big_default_avatar.jpg'" alt="user" id="upload_img" />
+                            </div>
+                            <input type="hidden" id="namePath" name="image">
                             <span class="upload_tips">支持.jpg .jpeg .bmp .gif格式照片，大小不超过2M。（请使用ie9或更高级版本浏览器上传）</span>
                         </td>
                     </tr>
                     <tr>
                         <td class="td_1">&nbsp;</td>
                         <td class="td_2">
-                            <a href="javascript:void(0);" title="提交" class="sub_info" id="subInfo">提交</a>
+                            <!-- <a href="javascript:void(0);" title="提交" class="sub_info" id="subInfo">提交</a> -->
+                            <input type="submit" value="提交" class="sub_info" id="subInfo">
                         </td>
                     </tr>
                  </table>
+                </form>
+
                  
 
 
@@ -464,94 +467,81 @@ $(function(){
             profile_util.cancelJcropImg('avatar');
         },
         'onUploadSuccess' : function(file, data, response) {
-            alert(data);
-            window.console && console.log("上传成功");
+            alert('上传成功');
+            // window.console && console.log("上传成功");
             if (response) {
-               // 隐藏原图片和提示
-               $('#imgWrap').hide();
-
-
-                $("#avatar_upload_file-queue").hide();
-                $("#avatar_preview img").remove();
-        
-                var obj = $.parseJSON(data)
-                var imgUrl = obj.img;
-                var imgKey = obj.file;
-                profile_util.previewImg(imgUrl, 500, 'avatar', imgKey,'');
-                $("#avatarpreviewdiv").show().css('float','right');
-                $("#avatarSureButton").show();
-                $("#avatarFailButton").show();
-                $("#avatarpreview2").attr("src",imgUrl).css('max-width','none'); 
-                profile_util.JcropAvatar();
+                $('#upload_img').attr('src',data);
+                $('#namePath').val(data);
             }
         } 
     });
+
 
     $('#avatarSureButton').on('click',function(){
         // $('#imgWrap').hide();
     });
 
-    $('#subInfo').on('click',function(){
-        var liveType = $('#liveType').val(),
-            mobile = $.trim($('#phoneNum').val()),
-            avatar_id = $('#avatar_id').val(),
-            xywh = $('#xywh').val(),
-            anchor_nick = $('#anchor_nick').val();
-        //主播昵称验证
-        var tmpStr = anchor_nick.replace(/[\u4e00-\u9fa5]/gi,"aa"),//使用英文字符替换中文
-            tmpStrLen = tmpStr.length;
-        if(tmpStrLen > 20){//验证长度
-            //alert("您的昵称过长");
-            $("#checkNickWord").show();
-            return;
-        }else{
-            $("#checkNickWord").hide();
-        }
-        var testNick = /^(?!\s)(?!.*?\s$)[a-zA-Z0-9\u4e00-\u9fa5\-\、]+$/;
-        if(!testNick.test(anchor_nick)){
-            //alert("昵称含有非法字符");
-            $("#checkNickWord").show();
-            return;
-        }else{
-            $("#checkNickWord").hide();
-        }
+    // $('#subInfo').on('click',function(){
+    //     var liveType = $('#liveType').val(),
+    //         mobile = $.trim($('#phoneNum').val()),
+    //         avatar_id = $('#avatar_id').val(),
+    //         xywh = $('#xywh').val(),
+    //         anchor_nick = $('#anchor_nick').val();
+    //     //主播昵称验证
+    //     var tmpStr = anchor_nick.replace(/[\u4e00-\u9fa5]/gi,"aa"),//使用英文字符替换中文
+    //         tmpStrLen = tmpStr.length;
+    //     if(tmpStrLen > 20){//验证长度
+    //         //alert("您的昵称过长");
+    //         $("#checkNickWord").show();
+    //         return;
+    //     }else{
+    //         $("#checkNickWord").hide();
+    //     }
+    //     var testNick = /^(?!\s)(?!.*?\s$)[a-zA-Z0-9\u4e00-\u9fa5\-\、]+$/;
+    //     if(!testNick.test(anchor_nick)){
+    //         //alert("昵称含有非法字符");
+    //         $("#checkNickWord").show();
+    //         return;
+    //     }else{
+    //         $("#checkNickWord").hide();
+    //     }
         
 
-        if(!avatar_id){
-            alert("请上传头像！");
-            return;
-        }
+        // if(!avatar_id){
+        //     alert("请上传头像！");
+        //     return;
+        // }
 
-        if(!xywh){
-            alert("上传头像后，请点击确定按钮！");
-            return;
-        }
+        // if(!xywh){
+        //     alert("上传头像后，请点击确定按钮！");
+        //     return;
+        // }
 
-        $.post( indexUrl + "index.php?m=ProfileAuth&do=saveInfo",{
-            liveType:liveType,
-            avatar_id:avatar_id,
-            xywh:xywh,
-            nick:anchor_nick
-        },function(res){
-            window.console && console.log("上传头像返回：");
-            var res = $.parseJSON(res);
+    //     $.post( indexUrl + "index.php?m=ProfileAuth&do=saveInfo",{
+    //         liveType:liveType,
+    //         avatar_id:avatar_id,
+    //         xywh:xywh,
+    //         nick:anchor_nick
+    //     },function(res){
+    //         window.console && console.log("上传头像返回：");
+    //         var res = $.parseJSON(res);
 
-            if(res.status === 200){
-                alert('已提交成功！');
-                location.reload();
-            }else{
-                alert('提交失败：' + res.message);
-            }
-        });
+    //         if(res.status === 200){
+    //             alert('已提交成功！');
+    //             location.reload();
+    //         }else{
+    //             alert('提交失败：' + res.message);
+    //         }
+    //     });
 
-    });
+    // });
     //不支持placeholder
-    if(!placeholderSupport()){
-        $("#anchor_nick").after("<span>（控制在6个汉字以内最佳）</span>");
-    }
-    function placeholderSupport() {
-        return 'placeholder' in document.createElement('input');
-    }
+    // if(!placeholderSupport()){
+    //     $("#anchor_nick").after("<span>（控制在6个汉字以内最佳）</span>");
+    // }
+    // function placeholderSupport() {
+    //     return 'placeholder' in document.createElement('input');
+    // }
     //IE兼容placeholder
     /*if($.browser.msie) { 
         $(":input[placeholder]").each(function(){

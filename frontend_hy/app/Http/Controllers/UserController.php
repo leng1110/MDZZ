@@ -75,7 +75,7 @@ class UserController extends Controller
     		echo '<script>alert("密码不正确");location.href="user_login"</script>';
     	}
     	//登陆后个人信息的展示
-        $n_data = $curd->getRow('info','user_id',$p_data[0]['user_id']);
+        $n_data = $curd->getRow('userinfo','user_id',$p_data[0]['user_id']);
     	if($n_data == null){
     		session(['user_id' => $p_data[0]['user_id']]);
     	}else{
